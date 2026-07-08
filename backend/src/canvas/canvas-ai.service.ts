@@ -48,7 +48,7 @@ export class CanvasAiService {
           {
             role: "system",
             content:
-              'Return ONLY valid JSON with this exact shape: {"groups":[{"pattern":"row"|"column"|"grid"|"radial"|"single","shape":"circle"|"rectangle","nodes":[{"label":string,"color":string}],"cols"?:number,"hasCenter"?:boolean}]}. Do not include coordinates. Keep labels to 2 characters or fewer. Use only the allowed patterns and shapes.',
+              'Return ONLY valid JSON with this exact shape: {"groups":[{"pattern":"row"|"column"|"grid"|"radial"|"single","shape":"circle"|"rectangle","nodes":[{"label":string,"color":string}],"cols"?:number,"hasCenter"?:boolean}]}. Do not include coordinates. Keep labels to 2 characters or fewer. Use only the allowed patterns and shapes. Order the groups array top-to-bottom as they should appear visually on screen — the first group in the array will be placed at the top, the last at the bottom.',
           },
           {
             role: "user",
