@@ -45,12 +45,18 @@ export function CanvasBoard() {
       setNodes(nextState.nodes);
     };
 
+    const handleNodeMoved = (payload: { id: string; x: number; y: number }) => {
+      updateNodePosition(payload.id, payload.x, payload.y);
+    };
+
     socket.on("canvas:generated", handleCanvasGenerated);
+    socket.on("node:moved", handleNodeMoved);
 
     return () => {
       socket.off("canvas:generated", handleCanvasGenerated);
+      socket.off("node:moved", handleNodeMoved);
     };
-  }, [setNodes]);
+  }, [setNodes, updateNodePosition]);
 
   return (
     <div className="canvas-shell" ref={containerRef}>

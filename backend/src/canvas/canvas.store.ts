@@ -28,6 +28,21 @@ export class CanvasStore implements OnModuleInit {
     return this.getState();
   }
 
+  async updateNodePosition(
+    id: string,
+    x: number,
+    y: number,
+  ): Promise<CanvasSnapshot> {
+    this.state = {
+      nodes: this.state.nodes.map((node) =>
+        node.id === id ? { ...node, x, y } : node,
+      ),
+    };
+
+    await this.persist();
+    return this.getState();
+  }
+
   private async load(): Promise<void> {
     await mkdir(dirname(STATE_FILE_PATH), { recursive: true });
 
