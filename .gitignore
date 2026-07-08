@@ -3,7 +3,7 @@ node_modules
 /.next
 /.turbo
 coverage
-.tsbuildinfo
+*.tsbuildinfo
 backend/data/*.tmp
 backend/dist
 frontend/dist
