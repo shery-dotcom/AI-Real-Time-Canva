@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Fragment } from "react";
-import { Circle, Layer, Rect, Stage, Text } from "react-konva";
+import { Group, Circle, Layer, Rect, Stage, Text } from "react-konva";
 import type { KonvaEventObject } from "konva/lib/Node";
 import { socket } from "../lib/socket";
 import { useCanvasStore } from "../store/canvas";
@@ -67,15 +66,12 @@ export function CanvasBoard() {
       >
         <Layer>
           {nodes.map((node) => {
-            const commonProps = {
-              x: node.x,
-              y: node.y,
+            const dragHandlers = {
               draggable: true,
               onDragEnd: (event: KonvaEventObject<DragEvent>) => {
                 const nextX = event.target.x();
                 const nextY = event.target.y();
                 updateNodePosition(node.id, nextX, nextY);
-                event.target.position({ x: nextX, y: nextY });
                 socket.emit("node:move", {
                   id: node.id,
                   x: nextX,
@@ -86,64 +82,68 @@ export function CanvasBoard() {
 
             if (node.type === "circle") {
               const radius = node.radius ?? 36;
-              const size = radius * 2;
+              const labelSize = Math.max(20, Math.floor(radius * 0.65));
 
               return (
-                <Fragment key={node.id}>
+                <Group key={node.id} x={node.x} y={node.y} {...dragHandlers}>
                   <Circle
-                    {...commonProps}
+                    x={0}
+                    y={0}
                     radius={radius}
-                    offsetX={radius}
-                    offsetY={radius}
                     fill={node.color}
                     stroke="rgba(255,255,255,0.2)"
                     strokeWidth={2}
                   />
                   <Text
-                    key={`${node.id}-label`}
-                    x={node.x - size / 2}
-                    y={node.y - 10}
-                    width={size}
+                    x={-radius}
+                    y={-labelSize / 2}
+                    width={radius * 2}
+                    height={labelSize}
                     text={node.label}
                     fill="#ffffff"
+                    fontSize={labelSize}
                     fontStyle="bold"
                     align="center"
                     verticalAlign="middle"
                     listening={false}
                   />
-                </Fragment>
+                </Group>
               );
             }
 
             const width = node.width ?? 140;
             const height = node.height ?? 96;
+            const labelSize = Math.max(
+              20,
+              Math.floor(Math.min(width, height) * 0.35),
+            );
 
             return (
-              <Fragment key={node.id}>
+              <Group key={node.id} x={node.x} y={node.y} {...dragHandlers}>
                 <Rect
-                  {...commonProps}
+                  x={-width / 2}
+                  y={-height / 2}
                   width={width}
                   height={height}
                   fill={node.color}
                   cornerRadius={18}
-                  offsetX={width / 2}
-                  offsetY={height / 2}
                   stroke="rgba(255,255,255,0.2)"
                   strokeWidth={2}
                 />
                 <Text
-                  key={`${node.id}-label`}
-                  x={node.x - width / 2}
-                  y={node.y - 10}
+                  x={-width / 2}
+                  y={-labelSize / 2}
                   width={width}
+                  height={labelSize}
                   text={node.label}
                   fill="#ffffff"
+                  fontSize={labelSize}
                   fontStyle="bold"
                   align="center"
                   verticalAlign="middle"
                   listening={false}
                 />
-              </Fragment>
+              </Group>
             );
           })}
         </Layer>

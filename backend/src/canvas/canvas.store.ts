@@ -87,7 +87,7 @@ export class CanvasStore implements OnModuleInit {
       typeof node.label === "string" ? node.label.trim().slice(0, 2) : "";
     const color =
       typeof node.color === "string" && node.color.trim().length > 0
-        ? node.color
+        ? this.normalizeColor(node.color)
         : "#6366f1";
     const x = this.clampCoordinate(node.x, this.canvasWidth);
     const y = this.clampCoordinate(node.y, this.canvasHeight);
@@ -124,5 +124,21 @@ export class CanvasStore implements OnModuleInit {
   private clampDimension(value: number, min: number, max: number): number {
     const safeValue = Number.isFinite(value) ? value : min;
     return Math.min(Math.max(Math.round(safeValue), min), max);
+  }
+
+  private normalizeColor(color: string): string {
+    const normalized = color.trim().toLowerCase();
+
+    if (
+      normalized === "black" ||
+      normalized === "#000" ||
+      normalized === "#000000" ||
+      normalized === "rgb(0,0,0)" ||
+      normalized === "rgba(0,0,0,1)"
+    ) {
+      return "#6366f1";
+    }
+
+    return color;
   }
 }

@@ -1,3 +1,53 @@
 {
-  "nodes": []
+  "nodes": [
+    {
+      "id": "8ebd1c69-a635-42d9-8c02-5735f430f2e0",
+      "type": "rectangle",
+      "x": 230,
+      "y": 170,
+      "width": 162,
+      "height": 160,
+      "label": "A",
+      "color": "red"
+    },
+    {
+      "id": "cbd22a92-0051-4db7-9471-89a60fc95142",
+      "type": "rectangle",
+      "x": 480,
+      "y": 170,
+      "width": 162,
+      "height": 160,
+      "label": "B",
+      "color": "blue"
+    },
+    {
+      "id": "e2247a54-6965-4d18-8c4d-cadfe040fd6d",
+      "type": "rectangle",
+      "x": 730,
+      "y": 170,
+      "width": 162,
+      "height": 160,
+      "label": "C",
+      "color": "green"
+    },
+    {
+      "id": "c483dc08-4b4c-42a1-84cd-8ace972a0fd0",
+      "type": "rectangle",
+      "x": 950,
+      "y": 180,
+      "width": 162,
+      "height": 160,
+      "label": "D",
+      "color": "yellow"
+    },
+    {
+      "id": "aa91d19b-917a-4281-b927-df026ce0c3cb",
+      "type": "circle",
+      "x": 590,
+      "y": 530,
+      "radius": 72,
+      "label": "E",
+      "color": "purple"
+    }
+  ]
 }
