@@ -1,4 +1,22 @@
 export type CanvasNodeType = "circle" | "rectangle";
+export type CanvasPattern = "row" | "column" | "grid" | "radial" | "single";
+
+export interface CanvasGroupNode {
+  label: string;
+  color: string;
+}
+
+export interface CanvasGroupPlan {
+  pattern: CanvasPattern;
+  shape: CanvasNodeType;
+  nodes: CanvasGroupNode[];
+  cols?: number;
+  hasCenter?: boolean;
+}
+
+export interface CanvasGenerationPlan {
+  groups: CanvasGroupPlan[];
+}
 
 export interface CanvasNode {
   id: string;

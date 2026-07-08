@@ -1,4 +1,6 @@
 import { Body, Controller, Get, Post, Put } from "@nestjs/common";
+import { CanvasAiService } from "./canvas-ai.service";
+import { CanvasLayoutService } from "./canvas-layout.service";
 import { CanvasGateway } from "./canvas.gateway";
 import { CanvasSnapshot } from "./canvas.types";
 import { CanvasStore } from "./canvas.store";
@@ -8,11 +10,15 @@ export class CanvasController {
   constructor(
     private readonly canvasStore: CanvasStore,
     private readonly canvasGateway: CanvasGateway,
+    private readonly canvasAiService: CanvasAiService,
+    private readonly canvasLayoutService: CanvasLayoutService,
   ) {}
 
   @Post("generate")
   async generate(@Body() body: { prompt: string }): Promise<CanvasSnapshot> {
-    const state = await this.canvasStore.generateFromPrompt(body.prompt);
+    const plan = await this.canvasAiService.createGenerationPlan(body.prompt);
+    const state = this.canvasLayoutService.buildSnapshot(plan);
+    await this.canvasStore.replaceState(state);
     this.canvasGateway.broadcastCanvasState(state);
     return state;
   }
