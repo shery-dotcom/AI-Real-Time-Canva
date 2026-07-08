@@ -32,12 +32,21 @@ export class CanvasGateway implements OnGatewayConnection {
     @ConnectedSocket() client: Socket,
     @MessageBody() body: { id: string; x: number; y: number },
   ): Promise<void> {
-    await this.canvasStore.updateNodePosition(body.id, body.x, body.y);
+    const state = await this.canvasStore.updateNodePosition(
+      body.id,
+      body.x,
+      body.y,
+    );
+    const movedNode = state.nodes.find((node) => node.id === body.id);
+
+    if (!movedNode) {
+      return;
+    }
 
     client.broadcast.emit("node:moved", {
-      id: body.id,
-      x: body.x,
-      y: body.y,
+      id: movedNode.id,
+      x: movedNode.x,
+      y: movedNode.y,
     });
   }
 

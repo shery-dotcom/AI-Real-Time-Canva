@@ -75,6 +75,7 @@ export function CanvasBoard() {
                 const nextX = event.target.x();
                 const nextY = event.target.y();
                 updateNodePosition(node.id, nextX, nextY);
+                event.target.position({ x: nextX, y: nextY });
                 socket.emit("node:move", {
                   id: node.id,
                   x: nextX,

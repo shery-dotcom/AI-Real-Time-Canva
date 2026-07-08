@@ -59,12 +59,15 @@ export class CanvasLayoutService {
     const count = group.nodes.length;
     const centerY = area.top + area.height / 2;
     const spacing = area.width / (count + 1);
+    const radius = this.scaleRadiusByRow(area.width, count);
 
     return group.nodes.map((node, index) =>
       this.createNode(node.label, node.color, group.shape, {
         x: area.left + spacing * (index + 1),
         y: centerY,
         index,
+        width: radius * 2,
+        height: radius * 2,
       }),
     );
   }
@@ -73,12 +76,15 @@ export class CanvasLayoutService {
     const count = group.nodes.length;
     const centerX = area.left + area.width / 2;
     const spacing = area.height / (count + 1);
+    const radius = this.scaleRadiusByColumn(area.height, count);
 
     return group.nodes.map((node, index) =>
       this.createNode(node.label, node.color, group.shape, {
         x: centerX,
         y: area.top + spacing * (index + 1),
         index,
+        width: radius * 2,
+        height: radius * 2,
       }),
     );
   }
@@ -89,6 +95,10 @@ export class CanvasLayoutService {
     const rows = Math.ceil(count / cols);
     const cellWidth = area.width / cols;
     const cellHeight = area.height / rows;
+    const dimension = Math.max(
+      28,
+      Math.floor(Math.min(cellWidth, cellHeight) * 0.58),
+    );
 
     return group.nodes.map((node, index) => {
       const column = index % cols;
@@ -98,6 +108,8 @@ export class CanvasLayoutService {
         x: area.left + cellWidth * column + cellWidth / 2,
         y: area.top + cellHeight * row + cellHeight / 2,
         index,
+        width: dimension,
+        height: dimension,
       });
     });
   }
@@ -108,6 +120,10 @@ export class CanvasLayoutService {
     const centerY = area.top + area.height / 2;
     const radius = Math.min(area.width, area.height) * 0.3;
     const ringCount = group.hasCenter ? Math.max(count - 1, 0) : count;
+    const nodeRadius = Math.max(
+      28,
+      Math.floor(Math.min(area.width, area.height) * 0.08),
+    );
 
     return group.nodes.map((node, index) => {
       if (group.hasCenter && index === 0) {
@@ -115,6 +131,8 @@ export class CanvasLayoutService {
           x: centerX,
           y: centerY,
           index,
+          width: nodeRadius * 2,
+          height: nodeRadius * 2,
         });
       }
 
@@ -128,6 +146,8 @@ export class CanvasLayoutService {
         x: centerX + radius * Math.cos(angle),
         y: centerY + radius * Math.sin(angle),
         index,
+        width: nodeRadius * 2,
+        height: nodeRadius * 2,
       });
     });
   }
@@ -135,12 +155,18 @@ export class CanvasLayoutService {
   private layoutSingle(group: CanvasGroupPlan, area: LayoutArea): CanvasNode[] {
     const centerX = area.left + area.width / 2;
     const centerY = area.top + area.height / 2;
+    const scale = Math.max(
+      36,
+      Math.floor(Math.min(area.width, area.height) * 0.22),
+    );
 
     return group.nodes.map((node, index) =>
       this.createNode(node.label, node.color, group.shape, {
         x: centerX,
         y: centerY,
         index,
+        width: scale * 2,
+        height: scale * 2,
       }),
     );
   }
@@ -149,10 +175,16 @@ export class CanvasLayoutService {
     label: string,
     color: string,
     type: CanvasNodeType,
-    position: { x: number; y: number; index: number },
+    position: {
+      x: number;
+      y: number;
+      index: number;
+      width: number;
+      height: number;
+    },
   ): CanvasNode {
-    const offsetX = (position.index % 3) * 14 - 14;
-    const offsetY = Math.floor(position.index / 3) * 14 - 14;
+    const offsetX = (position.index % 3) * 10 - 10;
+    const offsetY = Math.floor(position.index / 3) * 10 - 10;
 
     if (type === "circle") {
       return {
@@ -160,7 +192,7 @@ export class CanvasLayoutService {
         type,
         x: Math.round(position.x + offsetX),
         y: Math.round(position.y + offsetY),
-        radius: 34,
+        radius: Math.floor(Math.min(position.width, position.height) / 2),
         label,
         color,
       };
@@ -171,10 +203,20 @@ export class CanvasLayoutService {
       type,
       x: Math.round(position.x + offsetX),
       y: Math.round(position.y + offsetY),
-      width: 120,
-      height: 72,
+      width: position.width,
+      height: position.height,
       label,
       color,
     };
+  }
+
+  private scaleRadiusByRow(width: number, count: number): number {
+    const spacing = width / (count + 1);
+    return Math.max(28, Math.min(84, Math.floor(spacing * 0.34)));
+  }
+
+  private scaleRadiusByColumn(height: number, count: number): number {
+    const spacing = height / (count + 1);
+    return Math.max(28, Math.min(84, Math.floor(spacing * 0.34)));
   }
 }

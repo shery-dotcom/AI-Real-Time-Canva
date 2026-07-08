@@ -13,7 +13,9 @@ async function bootstrap(): Promise<void> {
 
   app.setGlobalPrefix("api");
 
-  await app.listen(8080);
+  const port = Number(process.env.PORT ?? 8080);
+
+  await app.listen(port);
 }
 
 void bootstrap();

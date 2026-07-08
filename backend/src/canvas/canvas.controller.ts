@@ -17,7 +17,9 @@ export class CanvasController {
   @Post("generate")
   async generate(@Body() body: { prompt: string }): Promise<CanvasSnapshot> {
     const plan = await this.canvasAiService.createGenerationPlan(body.prompt);
-    const state = this.canvasLayoutService.buildSnapshot(plan);
+    const state = this.canvasStore.sanitizeSnapshot(
+      this.canvasLayoutService.buildSnapshot(plan),
+    );
     await this.canvasStore.replaceState(state);
     this.canvasGateway.broadcastCanvasState(state);
     return state;
@@ -30,7 +32,9 @@ export class CanvasController {
 
   @Put("state")
   async replaceState(@Body() body: CanvasSnapshot): Promise<CanvasSnapshot> {
-    const state = await this.canvasStore.replaceState(body);
+    const state = await this.canvasStore.replaceState(
+      this.canvasStore.sanitizeSnapshot(body),
+    );
     this.canvasGateway.broadcastCanvasState(state);
     return state;
   }

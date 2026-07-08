@@ -8,6 +8,8 @@ const STATE_FILE_PATH = join(process.cwd(), "data", "canvas-state.json");
 @Injectable()
 export class CanvasStore implements OnModuleInit {
   private state: CanvasSnapshot = { nodes: [] };
+  private readonly canvasWidth = 1200;
+  private readonly canvasHeight = 720;
 
   async onModuleInit(): Promise<void> {
     await this.load();
@@ -21,7 +23,7 @@ export class CanvasStore implements OnModuleInit {
 
   async replaceState(state: CanvasSnapshot): Promise<CanvasSnapshot> {
     this.state = {
-      nodes: state.nodes.map((node) => ({ ...node })),
+      nodes: state.nodes.slice(0, 12).map((node) => this.sanitizeNode(node)),
     };
 
     await this.persist();
@@ -43,6 +45,12 @@ export class CanvasStore implements OnModuleInit {
     return this.getState();
   }
 
+  sanitizeSnapshot(snapshot: CanvasSnapshot): CanvasSnapshot {
+    return {
+      nodes: snapshot.nodes.slice(0, 12).map((node) => this.sanitizeNode(node)),
+    };
+  }
+
   private async load(): Promise<void> {
     await mkdir(dirname(STATE_FILE_PATH), { recursive: true });
 
@@ -52,7 +60,7 @@ export class CanvasStore implements OnModuleInit {
 
       this.state = {
         nodes: Array.isArray(parsed.nodes)
-          ? parsed.nodes.map((node) => ({ ...node }))
+          ? parsed.nodes.slice(0, 12).map((node) => this.sanitizeNode(node))
           : [],
       };
     } catch {
@@ -68,5 +76,53 @@ export class CanvasStore implements OnModuleInit {
       `${JSON.stringify(this.state, null, 2)}\n`,
       "utf8",
     );
+  }
+
+  private sanitizeNode(node: CanvasNode): CanvasNode {
+    const type =
+      node.type === "circle" || node.type === "rectangle"
+        ? node.type
+        : "rectangle";
+    const label =
+      typeof node.label === "string" ? node.label.trim().slice(0, 2) : "";
+    const color =
+      typeof node.color === "string" && node.color.trim().length > 0
+        ? node.color
+        : "#6366f1";
+    const x = this.clampCoordinate(node.x, this.canvasWidth);
+    const y = this.clampCoordinate(node.y, this.canvasHeight);
+
+    if (type === "circle") {
+      return {
+        id: node.id,
+        type,
+        x,
+        y,
+        radius: this.clampDimension(node.radius ?? 36, 20, 72),
+        label,
+        color,
+      };
+    }
+
+    return {
+      id: node.id,
+      type,
+      x,
+      y,
+      width: this.clampDimension(node.width ?? 120, 56, 220),
+      height: this.clampDimension(node.height ?? 72, 40, 160),
+      label,
+      color,
+    };
+  }
+
+  private clampCoordinate(value: number, max: number): number {
+    const safeValue = Number.isFinite(value) ? value : 0;
+    return Math.min(Math.max(Math.round(safeValue), 0), max - 1);
+  }
+
+  private clampDimension(value: number, min: number, max: number): number {
+    const safeValue = Number.isFinite(value) ? value : min;
+    return Math.min(Math.max(Math.round(safeValue), min), max);
   }
 }

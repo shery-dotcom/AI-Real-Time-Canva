@@ -11,5 +11,7 @@ frontend/vite.config.js
 frontend/vite.config.d.ts
 .env
 .env.*
+!.env.example
+!backend/.env.example
 .DS_Store
 backend/data/*.tmp
